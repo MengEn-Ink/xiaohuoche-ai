@@ -142,3 +142,27 @@ def test_material_studio_preview_stage_does_not_overlay_summary() -> None:
     assert ".workspace.preview-mode .workspace-summary" in style
     assert ".workspace.preview-mode .preview-stage" in style
     assert "body.preview-mode .stage-nav" in style
+
+
+def test_material_studio_supports_storyboard_preview_contract() -> None:
+    html = (PAGE_ROOT / "index.html").read_text(encoding="utf-8")
+    style = (PAGE_ROOT / "styles.css").read_text(encoding="utf-8")
+    script = (PAGE_ROOT / "app.js").read_text(encoding="utf-8")
+
+    assert "段落标题" in html
+    assert "副标题 / 短句" in html
+    assert 'data-file-field="segment_title"' in script
+    assert 'data-file-field="segment_subtitle"' in script
+    assert "storyboard-preview" in script
+    assert "storyboard-card" in script
+    assert "function renderStoryboardPreview" in script
+    assert "function materialStoryTitle" in script
+    assert "function materialStorySubtitle" in script
+    assert "segment_title" in script
+    assert "segment_subtitle" in script
+    assert "段落标题" in script
+    assert "副标题" in script
+    assert "日报故事板" in script
+    assert ".storyboard-preview" in style
+    assert ".storyboard-card" in style
+    assert ".story-label" in style

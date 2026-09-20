@@ -111,6 +111,8 @@ async function handleFiles(files) {
         height: meta.height,
         note: "",
         caption: "",
+        segment_title: "",
+        segment_subtitle: "",
         layout_role: defaultLayoutRole(index),
         ai_instruction: "",
         file,
@@ -205,6 +207,16 @@ function renderLayoutWorkbench() {
           <label>
             图片说明
             <input data-file-field="caption" data-file-id="${escapeHtml(item.id)}" type="text" placeholder="例如：队伍爬坡进入最后一公里" value="${escapeHtml(item.caption)}" />
+          </label>
+        </div>
+        <div class="two-column">
+          <label>
+            段落标题
+            <input data-file-field="segment_title" data-file-id="${escapeHtml(item.id)}" type="text" placeholder="例如：冲线前五百米" value="${escapeHtml(item.segment_title)}" />
+          </label>
+          <label>
+            副标题 / 短句
+            <input data-file-field="segment_subtitle" data-file-id="${escapeHtml(item.id)}" type="text" placeholder="例如：腿还在，人已经开始嘴硬" value="${escapeHtml(item.segment_subtitle)}" />
           </label>
         </div>
         <label>
@@ -330,6 +342,8 @@ function buildDraftMarkdown(input = readForm()) {
         `- ${index + 1}. ${file.filename}`,
         `  - 版位：${layoutRoleLabel(file.layout_role)}`,
         `  - 文件：${file.relative_path} (${size}, ${formatBytes(file.size)})`,
+        `  - 段落标题：${file.segment_title || materialStoryTitle(file, index)}`,
+        `  - 副标题：${file.segment_subtitle || materialStorySubtitle(file)}`,
         `  - 图片说明：${file.caption || "待补充"}`,
         `  - 素材备注：${file.note || "待补充"}`,
         `  - AI 批注：${file.ai_instruction || "待补充"}`,
@@ -376,6 +390,8 @@ function buildLayoutJson(input = readForm()) {
       package_path: `materials/original/${file.relative_path}`,
       layout_role: file.layout_role,
       layout_role_label: layoutRoleLabel(file.layout_role),
+      segment_title: file.segment_title,
+      segment_subtitle: file.segment_subtitle,
       caption: file.caption,
       note: file.note,
       ai_instruction: file.ai_instruction,
@@ -409,6 +425,8 @@ function buildInstructionsMarkdown(input = readForm()) {
         `### ${index + 1}. ${file.filename}`,
         `- 路径：materials/original/${file.relative_path}`,
         `- 版位：${layoutRoleLabel(file.layout_role)}`,
+        `- 段落标题：${file.segment_title || materialStoryTitle(file, index)}`,
+        `- 副标题：${file.segment_subtitle || materialStorySubtitle(file)}`,
         `- 图片说明：${file.caption || "-"}`,
         `- 素材备注：${file.note || "-"}`,
         `- AI 批注：${file.ai_instruction || "-"}`,
@@ -434,7 +452,8 @@ function buildPreviewHtml(input = readForm()) {
           ${image}
           <div>
             <p class="role">${index + 1}. ${escapeHtml(layoutRoleLabel(file.layout_role))}</p>
-            <h2>${escapeHtml(file.filename)}</h2>
+            <h2>${escapeHtml(materialStoryTitle(file, index))}</h2>
+            <p class="subtitle">${escapeHtml(materialStorySubtitle(file))}</p>
             <p>${escapeHtml(file.caption || "未填写图片说明")}</p>
             <dl>
               <dt>路径</dt><dd>materials/original/${escapeHtml(file.relative_path)}</dd>
@@ -458,10 +477,12 @@ function buildPreviewHtml(input = readForm()) {
       main { max-width: 960px; margin: 0 auto; padding: 28px; }
       header, section, .material { border: 4px solid #111; background: #fff; padding: 20px; margin-bottom: 18px; box-shadow: 7px 7px 0 #111; }
       h1 { margin: 0 0 10px; font-size: 42px; line-height: 1; }
-      h2 { margin: 0 0 8px; }
+      h2 { margin: 0 0 8px; font-size: 34px; line-height: 1; }
       .label, .role { font-weight: 900; background: #ffe04f; display: inline-block; padding: 4px 8px; border: 2px solid #111; }
-      .material { display: grid; grid-template-columns: 220px 1fr; gap: 18px; }
-      img, .thumb-placeholder { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 3px solid #111; background: #f5f1e8; }
+      .storyboard { display: grid; gap: 18px; }
+      .material { display: grid; grid-template-columns: minmax(260px, 44%) 1fr; gap: 18px; align-items: stretch; }
+      img, .thumb-placeholder { width: 100%; min-height: 280px; height: 100%; object-fit: cover; border: 3px solid #111; background: #f5f1e8; }
+      .subtitle { font-size: 18px; font-weight: 900; line-height: 1.45; }
       dt { font-weight: 900; }
       dd { margin: 0 0 8px; }
       @media (max-width: 720px) { .material { grid-template-columns: 1fr; } }
@@ -487,8 +508,10 @@ function buildPreviewHtml(input = readForm()) {
         <p>${escapeHtml(input.privacy_notes || "-")}</p>
       </section>
       <section>
-        <h2>素材顺序与版位</h2>
+        <h2>日报故事板</h2>
+        <div class="storyboard">
         ${materials || "<p>未选择素材。</p>"}
+        </div>
       </section>
     </main>
   </body>
@@ -561,6 +584,8 @@ function materialRecord(file, index) {
     height: file.height,
     layout_role: file.layout_role,
     layout_role_label: layoutRoleLabel(file.layout_role),
+    segment_title: file.segment_title,
+    segment_subtitle: file.segment_subtitle,
     caption: file.caption,
     note: file.note,
     ai_instruction: file.ai_instruction,
@@ -601,26 +626,32 @@ function downloadBlob(filename, blob) {
 
 function updatePreview() {
   preview.textContent = buildDraftMarkdown();
-  renderVisualPreview();
+  renderStoryboardPreview();
   renderStageNav();
   renderWorkspaceSummary();
   updateExportState();
 }
 
 function renderVisualPreview() {
+  renderStoryboardPreview();
+}
+
+function renderStoryboardPreview() {
   const input = readForm();
   const bodyPoints = htmlList(toLines(input.copy.body_points));
-  const materialList = state.files
+  const storyboardCards = state.files
     .map((file, index) => {
       const image = file.preview_url
         ? `<img src="${escapeHtml(file.preview_url)}" alt="${escapeHtml(file.filename)} 预览" />`
         : `<div class="preview-thumb placeholder">无预览</div>`;
       return `
-        <article class="preview-item">
-          ${image}
-          <div>
-            <span>${index + 1}. ${escapeHtml(layoutRoleLabel(file.layout_role))}</span>
-            <strong>${escapeHtml(file.caption || file.filename)}</strong>
+        <article class="storyboard-card">
+          <div class="story-media">${image}</div>
+          <div class="story-copy">
+            <span class="story-label">${index + 1}. ${escapeHtml(layoutRoleLabel(file.layout_role))}</span>
+            <h4>${escapeHtml(materialStoryTitle(file, index))}</h4>
+            <p class="story-subtitle">${escapeHtml(materialStorySubtitle(file))}</p>
+            <p>${escapeHtml(file.caption || "暂无图片说明")}</p>
             <p>${escapeHtml(file.note || "暂无素材备注")}</p>
             <p>${escapeHtml(file.ai_instruction || "暂无单图 AI 批注")}</p>
           </div>
@@ -643,10 +674,18 @@ function renderVisualPreview() {
       <strong>隐私注意事项</strong>
       <p>${escapeHtml(input.privacy_notes || "未填写隐私注意事项")}</p>
     </div>
-    <div class="preview-materials">
-      ${materialList || "<p>未选择素材。</p>"}
+    <div class="storyboard-preview" aria-label="日报故事板">
+      ${storyboardCards || "<p>未选择素材。</p>"}
     </div>
   `;
+}
+
+function materialStoryTitle(file, index) {
+  return file.segment_title || file.caption || file.note || `${index + 1}. ${file.filename}`;
+}
+
+function materialStorySubtitle(file) {
+  return file.segment_subtitle || file.ai_instruction || file.caption || "待补充副标题";
 }
 
 function moveFile(id, direction) {

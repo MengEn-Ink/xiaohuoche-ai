@@ -71,7 +71,7 @@ gh api -X POST repos/MengEn-Ink/xiaohuoche-ai/pages \
   -f build_type=workflow
 ```
 
-采集台是纯静态页面，只生成本地下载文件，不上传真实素材。页面采用分页工作台，用户可以在活动信息、素材池、排版台、文案批注和最终预览之间自由前后回看调整。最终预览页是确认和导出入口，后续实现应按预览中的文案、排序、版位、图片说明、AI 要求和隐私提醒执行。
+采集台是纯静态页面，只生成本地下载文件，不上传真实素材。页面采用分页工作台，用户可以在活动信息、素材池、排版台、文案批注和最终预览之间自由前后回看调整。排版台支持为每张素材补充段落标题和副标题 / 短句；最终预览页是确认和导出入口，以日报故事板方式展示段落标签、大标题、短句、图片和批注。后续实现应按预览中的文案、排序、版位、故事板标题、图片说明、AI 要求和隐私提醒执行。
 
 采集台推荐导出完整素材包 ZIP，结构固定为：
 
@@ -89,7 +89,7 @@ gh api -X POST repos/MengEn-Ink/xiaohuoche-ai/pages \
       原始文件或原目录结构
 ```
 
-`instructions.md` 和 `layout.json` 记录已确认的执行要求；`preview/preview.html` 是解压后可打开的实现预览。`materials/original/` 中的文件以浏览器读取到的原始字节写入 ZIP，不经过 canvas 压缩或像素重采样。
+`instructions.md` 和 `layout.json` 记录已确认的执行要求，包括素材顺序、版位、段落标题、副标题、图片说明和 AI 批注；`preview/preview.html` 是解压后可打开的日报故事板预览。`materials/original/` 中的文件以浏览器读取到的原始字节写入 ZIP，不经过 canvas 压缩或像素重采样。
 
 ## 验证
 
@@ -97,7 +97,7 @@ gh api -X POST repos/MengEn-Ink/xiaohuoche-ai/pages \
 git ls-remote --heads https://github.com/MengEn-Ink/xiaohuoche-ai.git main
 gh repo view MengEn-Ink/xiaohuoche-ai --json url,visibility,defaultBranchRef
 gh run list --repo MengEn-Ink/xiaohuoche-ai --workflow pages.yml --limit 5
-curl -L https://mengen-ink.github.io/xiaohuoche-ai/ | rg "分页工作台|最终预览|排版台|我确认后续实现必须以当前最终预览为准"
+curl -L https://mengen-ink.github.io/xiaohuoche-ai/ | rg "分页工作台|最终预览|排版台|段落标题|我确认后续实现必须以当前最终预览为准"
 ```
 
-仓库应为公开仓库，默认分支应为 `main`，内容应只包含脱敏源码快照。Pages workflow 应成功，线上页面应包含分页工作台、排版台、最终预览和确认导出文案。
+仓库应为公开仓库，默认分支应为 `main`，内容应只包含脱敏源码快照。Pages workflow 应成功，线上页面应包含分页工作台、排版台、段落标题、最终预览和确认导出文案。

@@ -80,7 +80,7 @@ python3 -m playwright install chromium
 https://mengen-ink.github.io/xiaohuoche-ai/
 ```
 
-采集台只在浏览器本地处理内容，不上传照片、截图或密钥。它采用分页工作台：先填活动信息，再管理素材池，随后进入排版台调整素材顺序和版位，最后补充文案与 AI 要求。最终预览页是确认和导出入口，后续实现应按预览中的文案、排序、版位、图片说明、AI 要求和隐私提醒执行。
+采集台只在浏览器本地处理内容，不上传照片、截图或密钥。它采用分页工作台：先填活动信息，再管理素材池，随后进入排版台调整素材顺序、版位、段落标题和副标题 / 短句，最后补充文案与 AI 要求。最终预览页是确认和导出入口，会按“日报故事板”展示段落标签、大标题、短句、图片和批注；后续实现应按预览中的文案、排序、版位、故事板标题、图片说明、AI 要求和隐私提醒执行。
 
 推荐使用“导出完整素材包 ZIP”。ZIP 会保持固定结构：
 
@@ -98,7 +98,7 @@ https://mengen-ink.github.io/xiaohuoche-ai/
       原始文件或原目录结构
 ```
 
-`instructions.md` 和 `layout.json` 记录已确认的文案、版位、素材顺序和 AI 批注；`preview/preview.html` 是人工复核用的实现预览。`materials/original/` 中的图片按浏览器拿到的原始 File 字节写入，不经过 canvas，不压缩、不缩放、不改变像素大小。
+`instructions.md` 和 `layout.json` 记录已确认的文案、版位、素材顺序、故事板段落标题、副标题和 AI 批注；`preview/preview.html` 是人工复核用的日报故事板预览。`materials/original/` 中的图片按浏览器拿到的原始 File 字节写入，不经过 canvas，不压缩、不缩放、不改变像素大小。
 
 ## 可选外部服务
 
