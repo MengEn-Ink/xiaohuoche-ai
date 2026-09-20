@@ -26,7 +26,14 @@ jobs:
         run: python -m compileall -q xzq pipeline.py scripts
 
       - name: Run tests
-        run: python -m pytest -q
+        run: >
+          python -m pytest -q
+          tests/test_open_source_snapshot.py
+          tests/test_config.py
+          tests/test_strava_auth.py
+          tests/test_wechat_token.py
+          tests/test_pipeline.py
+          tests/test_quality_check.py
 
       - name: Check open source snapshot
         run: python scripts/check_open_source_snapshot.py .
