@@ -82,6 +82,20 @@ https://mengen-ink.github.io/xiaohuoche-ai/
 
 采集台只在浏览器本地处理内容，不上传照片、截图或密钥。它会导出 `draft.md` 和 `manifest.json`，你可以把这两个文件连同真实素材放入本地 inbox，再继续执行 `pipeline.py collect/generate/review/render`。
 
+推荐使用“导出完整素材包 ZIP”。ZIP 会保持固定结构：
+
+```text
+日期-栏目/
+  draft.md
+  manifest.json
+  README.txt
+  materials/
+    original/
+      原始文件或原目录结构
+```
+
+`materials/original/` 中的图片按浏览器拿到的原始 File 字节写入，不经过 canvas，不压缩、不缩放、不改变像素大小。
+
 ## 可选外部服务
 
 所有凭证都放在 `.env` 中，且必须保持未跟踪状态。

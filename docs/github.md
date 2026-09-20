@@ -73,6 +73,20 @@ gh api -X POST repos/MengEn-Ink/xiaohuoche-ai/pages \
 
 采集台是纯静态页面，只生成本地下载文件，不上传真实素材。
 
+采集台推荐导出完整素材包 ZIP，结构固定为：
+
+```text
+日期-栏目/
+  draft.md
+  manifest.json
+  README.txt
+  materials/
+    original/
+      原始文件或原目录结构
+```
+
+`materials/original/` 中的文件以浏览器读取到的原始字节写入 ZIP，不经过 canvas 压缩或像素重采样。
+
 ## 验证
 
 ```bash

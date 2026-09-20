@@ -72,16 +72,23 @@
             <strong>选择本地图片</strong>
             <span>页面只读取文件名、大小、类型和尺寸，不上传文件。</span>
           </label>
+          <label class="drop directory">
+            <input id="folders" type="file" multiple webkitdirectory />
+            <strong>选择素材文件夹</strong>
+            <span>会保留相对路径写入 ZIP，例如 materials/original/原目录/文件名。</span>
+          </label>
           <div id="file-list" class="file-list" aria-live="polite"></div>
         </section>
 
         <section class="panel output">
           <h2>导出</h2>
-          <p>把 `draft.md`、`manifest.json` 和真实图片放进本地 inbox，再运行流水线。</p>
+          <p>推荐导出完整素材包 ZIP。包内包含 `draft.md`、`manifest.json` 和原始素材文件，原图字节不压缩、不缩放、不改像素。</p>
           <div class="actions">
+            <button type="button" id="download-zip">导出完整素材包 ZIP</button>
             <button type="button" id="download-draft">下载 draft.md</button>
             <button type="button" id="download-manifest">下载 manifest.json</button>
           </div>
+          <p class="package-shape">ZIP 结构：`日期-栏目/draft.md`、`日期-栏目/manifest.json`、`日期-栏目/materials/original/...`</p>
           <pre id="preview" aria-label="draft 预览"></pre>
         </section>
       </form>

@@ -20,6 +20,7 @@ def test_material_studio_states_local_only_privacy_contract() -> None:
     assert "不上传" in html
     assert "下载 draft.md" in html
     assert "下载 manifest.json" in html
+    assert "导出完整素材包 ZIP" in html
     assert "fetch(" not in script
     assert "XMLHttpRequest" not in script
 
@@ -29,9 +30,14 @@ def test_material_studio_exports_pipeline_compatible_files() -> None:
 
     assert "function buildDraftMarkdown" in script
     assert "function buildManifest" in script
+    assert "function buildZipPackage" in script
+    assert "materials/original/" in script
+    assert "preserve_original_bytes" in script
     assert "URL.createObjectURL" in script
     assert "strava_links" in script
     assert "materials" in script
+    assert ".arrayBuffer()" in script
+    assert "canvas" not in script.lower()
 
 
 def test_pages_workflow_publishes_material_studio_only() -> None:

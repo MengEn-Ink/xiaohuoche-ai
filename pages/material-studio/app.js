@@ -4,8 +4,10 @@ const state = {
 
 const form = document.querySelector("#material-form");
 const fileInput = document.querySelector("#files");
+const folderInput = document.querySelector("#folders");
 const fileList = document.querySelector("#file-list");
 const preview = document.querySelector("#preview");
+const zipButton = document.querySelector("#download-zip");
 const draftButton = document.querySelector("#download-draft");
 const manifestButton = document.querySelector("#download-manifest");
 
@@ -55,14 +57,17 @@ async function handleFiles(files) {
   const incoming = await Promise.all(
     Array.from(files).map(async (file, index) => {
       const meta = await readImageMeta(file);
+      const relativePath = normalizePath(file.webkitRelativePath || file.name);
       return {
         id: `${Date.now()}-${index}-${file.name}`,
         filename: file.name,
+        relative_path: relativePath,
         type: file.type || "application/octet-stream",
         size: file.size,
         width: meta.width,
         height: meta.height,
         note: "",
+        file,
       };
     }),
   );
@@ -86,6 +91,7 @@ function renderFiles() {
         <span>${escapeHtml(item.type)}</span>
         <span>${formatBytes(item.size)}</span>
         <span>${item.width && item.height ? `${item.width}x${item.height}` : "尺寸未知"}</span>
+        <span>${escapeHtml(item.relative_path)}</span>
       </div>
       <label>
         素材备注
@@ -135,22 +141,68 @@ function buildManifest(input = readForm()) {
     privacy: {
       local_only: true,
       uploads_files: false,
-      note: "manifest 只记录文件元数据和用户备注，不包含图片二进制。",
+      preserve_original_bytes: true,
+      note: "manifest 记录文件元数据和用户备注；完整 ZIP 会把原始素材文件按原字节写入 materials/original/。",
     },
     article: input,
     materials: state.files.map((file) => ({
       filename: file.filename,
+      relative_path: file.relative_path,
+      package_path: `materials/original/${file.relative_path}`,
       type: file.type,
       size: file.size,
       width: file.width,
       height: file.height,
       note: file.note,
+      preserve_original_bytes: true,
     })),
   };
 }
 
+async function buildZipPackage(input = readForm()) {
+  const root = packageRoot(input);
+  const entries = [
+    {
+      path: `${root}/draft.md`,
+      data: encodeText(buildDraftMarkdown(input)),
+    },
+    {
+      path: `${root}/manifest.json`,
+      data: encodeText(JSON.stringify(buildManifest(input), null, 2)),
+    },
+    {
+      path: `${root}/README.txt`,
+      data: encodeText(
+        [
+          "辛庄桥小火车素材采集包",
+          "",
+          "结构：",
+          "- draft.md：给流水线使用的素材初稿",
+          "- manifest.json：结构化素材清单",
+          "- materials/original/：原始素材文件，保持原文件字节和原图像素",
+          "",
+          "请把整个目录放入本地 inbox 后继续执行 pipeline.py。",
+        ].join("\n"),
+      ),
+    },
+  ];
+
+  for (const item of state.files) {
+    const bytes = new Uint8Array(await item.file.arrayBuffer());
+    entries.push({
+      path: `${root}/materials/original/${item.relative_path}`,
+      data: bytes,
+    });
+  }
+  return createZipBlob(entries);
+}
+
 function downloadText(filename, text, type) {
   const blob = new Blob([text], { type });
+  downloadBlob(filename, blob);
+}
+
+function downloadBlob(filename, blob) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -190,7 +242,109 @@ function escapeHtml(value) {
   });
 }
 
+function packageRoot(input) {
+  const date = slug(input.date || "xiaohuoche");
+  const kind = slug(input.kind || "ribao");
+  return `${date}-${kind}`;
+}
+
+function slug(value) {
+  return String(value)
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/^-+|-+$/g, "") || "xiaohuoche";
+}
+
+function normalizePath(path) {
+  return path
+    .split("/")
+    .map((part) => slug(part))
+    .filter(Boolean)
+    .join("/");
+}
+
+function encodeText(text) {
+  return new TextEncoder().encode(text);
+}
+
+function createZipBlob(entries) {
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  for (const entry of entries) {
+    const name = encodeText(entry.path);
+    const data = entry.data;
+    const crc = crc32(data);
+    const localHeader = zipLocalHeader(name, data, crc);
+    localParts.push(localHeader, data);
+    centralParts.push(zipCentralHeader(name, data, crc, offset));
+    offset += localHeader.length + data.length;
+  }
+  const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+  const end = zipEndRecord(entries.length, centralSize, offset);
+  return new Blob([...localParts, ...centralParts, end], { type: "application/zip" });
+}
+
+function zipLocalHeader(name, data, crc) {
+  const header = new Uint8Array(30 + name.length);
+  const view = new DataView(header.buffer);
+  view.setUint32(0, 0x04034b50, true);
+  view.setUint16(4, 20, true);
+  view.setUint16(6, 0x0800, true);
+  view.setUint16(8, 0, true);
+  view.setUint32(14, crc, true);
+  view.setUint32(18, data.length, true);
+  view.setUint32(22, data.length, true);
+  view.setUint16(26, name.length, true);
+  header.set(name, 30);
+  return header;
+}
+
+function zipCentralHeader(name, data, crc, offset) {
+  const header = new Uint8Array(46 + name.length);
+  const view = new DataView(header.buffer);
+  view.setUint32(0, 0x02014b50, true);
+  view.setUint16(4, 20, true);
+  view.setUint16(6, 20, true);
+  view.setUint16(8, 0x0800, true);
+  view.setUint16(10, 0, true);
+  view.setUint32(16, crc, true);
+  view.setUint32(20, data.length, true);
+  view.setUint32(24, data.length, true);
+  view.setUint16(28, name.length, true);
+  view.setUint32(42, offset, true);
+  header.set(name, 46);
+  return header;
+}
+
+function zipEndRecord(count, centralSize, centralOffset) {
+  const end = new Uint8Array(22);
+  const view = new DataView(end.buffer);
+  view.setUint32(0, 0x06054b50, true);
+  view.setUint16(8, count, true);
+  view.setUint16(10, count, true);
+  view.setUint32(12, centralSize, true);
+  view.setUint32(16, centralOffset, true);
+  return end;
+}
+
+function crc32(data) {
+  let crc = 0xffffffff;
+  for (const byte of data) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = crc & 1 ? (crc >>> 1) ^ 0xedb88320 : crc >>> 1;
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
 fileInput.addEventListener("change", (event) => {
+  handleFiles(event.target.files);
+});
+
+folderInput.addEventListener("change", (event) => {
   handleFiles(event.target.files);
 });
 
@@ -208,6 +362,19 @@ form.addEventListener("input", updatePreview);
 draftButton.addEventListener("click", () => {
   const input = readForm();
   downloadText(`${input.date || "xiaohuoche"}-${input.kind || "ribao"}-draft.md`, buildDraftMarkdown(input), "text/markdown;charset=utf-8");
+});
+
+zipButton.addEventListener("click", async () => {
+  const input = readForm();
+  zipButton.disabled = true;
+  zipButton.textContent = "正在打包...";
+  try {
+    const blob = await buildZipPackage(input);
+    downloadBlob(`${packageRoot(input)}-materials.zip`, blob);
+  } finally {
+    zipButton.disabled = false;
+    zipButton.textContent = "导出完整素材包 ZIP";
+  }
 });
 
 manifestButton.addEventListener("click", () => {

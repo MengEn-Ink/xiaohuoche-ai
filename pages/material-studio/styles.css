@@ -125,6 +125,11 @@ textarea {
   text-align: center;
 }
 
+.drop.directory {
+  min-height: 112px;
+  background: #fff8d8;
+}
+
 .drop input {
   border: 0;
   padding: 0;
@@ -165,7 +170,7 @@ textarea {
 
 .actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1.4fr repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -179,6 +184,14 @@ button {
 button:hover {
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 white;
+}
+
+.package-shape {
+  color: #f5f1e8;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 14px 0 0;
 }
 
 pre {
