@@ -1,8 +1,17 @@
 const state = {
+  currentStage: "activity",
   files: [],
   deletedFiles: [],
   confirmed: false,
 };
+
+const stages = [
+  { id: "activity", label: "活动信息" },
+  { id: "materials", label: "素材池" },
+  { id: "layout", label: "排版台" },
+  { id: "copy", label: "文案批注" },
+  { id: "preview", label: "最终预览" },
+];
 
 const layoutRoles = [
   ["cover", "封面"],
@@ -19,6 +28,7 @@ const form = document.querySelector("#material-form");
 const fileInput = document.querySelector("#files");
 const folderInput = document.querySelector("#folders");
 const fileList = document.querySelector("#file-list");
+const layoutWorkbench = document.querySelector("#layout-workbench");
 const preview = document.querySelector("#preview");
 const visualPreview = document.querySelector("#visual-preview");
 const zipButton = document.querySelector("#download-zip");
@@ -27,6 +37,10 @@ const manifestButton = document.querySelector("#download-manifest");
 const confirmExport = document.querySelector("#confirm-export");
 const deletedSummary = document.querySelector("#deleted-summary");
 const undoDeleteButton = document.querySelector("#undo-delete");
+const stageNav = document.querySelector("#stage-nav");
+const workspaceSummary = document.querySelector("#workspace-summary");
+const prevStageButton = document.querySelector("#prev-stage");
+const nextStageButton = document.querySelector("#next-stage");
 
 function readForm() {
   const data = new FormData(form);
@@ -106,6 +120,7 @@ async function handleFiles(files) {
   );
   state.files = incoming;
   renderFiles();
+  renderLayoutWorkbench();
   renderDeletedZone();
   updatePreview();
 }
@@ -142,32 +157,63 @@ function renderFiles() {
         </div>
       </div>
       <div class="file-controls">
-        <button type="button" data-file-action="move-up" data-file-id="${escapeHtml(item.id)}" ${index === 0 ? "disabled" : ""}>上移</button>
-        <button type="button" data-file-action="move-down" data-file-id="${escapeHtml(item.id)}" ${index === state.files.length - 1 ? "disabled" : ""}>下移</button>
+        <button type="button" data-stage="layout">去排版</button>
         <button type="button" data-file-action="delete" data-file-id="${escapeHtml(item.id)}">删除</button>
       </div>
-      <label>
-        版位
-        <select data-file-field="layout_role" data-file-id="${escapeHtml(item.id)}">
-          ${layoutRoles
-            .map(([value, label]) => `<option value="${value}" ${item.layout_role === value ? "selected" : ""}>${label}</option>`)
-            .join("")}
-        </select>
-      </label>
-      <label>
-        图片说明
-        <input data-file-field="caption" data-file-id="${escapeHtml(item.id)}" type="text" placeholder="例如：队伍爬坡进入最后一公里" value="${escapeHtml(item.caption)}" />
-      </label>
       <label>
         素材备注
         <input data-file-field="note" data-file-id="${escapeHtml(item.id)}" type="text" placeholder="例如：冲线、合照、群聊梗截图" value="${escapeHtml(item.note)}" />
       </label>
-      <label>
-        单图 AI 批注
-        <textarea data-file-field="ai_instruction" data-file-id="${escapeHtml(item.id)}" rows="3" placeholder="例如：保留人物表情，不要裁掉码表；车牌需打码">${escapeHtml(item.ai_instruction)}</textarea>
-      </label>
     `;
     fileList.appendChild(card);
+  }
+}
+
+function renderLayoutWorkbench() {
+  layoutWorkbench.innerHTML = "";
+  if (state.files.length === 0) {
+    layoutWorkbench.innerHTML = "<p>素材池为空。请先回到素材池选择本地图片。</p>";
+    return;
+  }
+  for (const [index, item] of state.files.entries()) {
+    const row = document.createElement("article");
+    row.className = "layout-row";
+    const thumbnail = item.preview_url
+      ? `<img class="file-thumb" src="${escapeHtml(item.preview_url)}" alt="${escapeHtml(item.filename)} 预览" />`
+      : `<div class="file-thumb placeholder">无预览</div>`;
+    row.innerHTML = `
+      ${thumbnail}
+      <div class="layout-body">
+        <div class="layout-title">
+          <strong>${index + 1}. ${escapeHtml(item.filename)}</strong>
+          <span>${item.width && item.height ? `${item.width}x${item.height}` : "尺寸未知"}</span>
+        </div>
+        <div class="file-controls">
+          <button type="button" data-file-action="move-up" data-file-id="${escapeHtml(item.id)}" ${index === 0 ? "disabled" : ""}>上移</button>
+          <button type="button" data-file-action="move-down" data-file-id="${escapeHtml(item.id)}" ${index === state.files.length - 1 ? "disabled" : ""}>下移</button>
+          <button type="button" data-stage="materials">回素材池</button>
+        </div>
+        <div class="two-column">
+          <label>
+            版位
+            <select data-file-field="layout_role" data-file-id="${escapeHtml(item.id)}">
+              ${layoutRoles
+                .map(([value, label]) => `<option value="${value}" ${item.layout_role === value ? "selected" : ""}>${label}</option>`)
+                .join("")}
+            </select>
+          </label>
+          <label>
+            图片说明
+            <input data-file-field="caption" data-file-id="${escapeHtml(item.id)}" type="text" placeholder="例如：队伍爬坡进入最后一公里" value="${escapeHtml(item.caption)}" />
+          </label>
+        </div>
+        <label>
+          单图 AI 批注
+          <textarea data-file-field="ai_instruction" data-file-id="${escapeHtml(item.id)}" rows="3" placeholder="例如：保留人物表情，不要裁掉码表；车牌需打码">${escapeHtml(item.ai_instruction)}</textarea>
+        </label>
+      </div>
+    `;
+    layoutWorkbench.appendChild(row);
   }
 }
 
@@ -177,6 +223,73 @@ function renderDeletedZone() {
     ? `已删除 ${state.deletedFiles.length} 个素材，最近删除：${last.item.filename}`
     : "暂无删除素材。";
   undoDeleteButton.disabled = state.deletedFiles.length === 0;
+}
+
+function setStage(stageId) {
+  if (!stages.some((stage) => stage.id === stageId)) return;
+  state.currentStage = stageId;
+  document.querySelectorAll("[data-stage-panel]").forEach((panel) => {
+    panel.hidden = panel.getAttribute("data-stage-panel") !== stageId;
+  });
+  renderStageNav();
+  renderWorkspaceSummary();
+  renderFiles();
+  renderLayoutWorkbench();
+  updatePreview();
+}
+
+function computeStageStatus(stageId, input = readForm()) {
+  if (stageId === "activity") {
+    if (!input.date && !input.summary && input.strava_links.length === 0) return "未填";
+    if (!input.privacy_notes) return "有风险";
+    return "已填";
+  }
+  if (stageId === "materials") {
+    if (state.files.length === 0) return "未填";
+    return state.deletedFiles.length > 0 ? "有风险" : "已填";
+  }
+  if (stageId === "layout") {
+    if (state.files.length === 0) return "未填";
+    return state.files.some((file) => file.layout_role === "unused" || !file.caption) ? "有风险" : "已填";
+  }
+  if (stageId === "copy") {
+    if (!input.copy.title && !input.copy.intro && !input.copy.body_points && !input.copy.outro && !input.ai_instruction) return "未填";
+    return !input.ai_instruction ? "有风险" : "已填";
+  }
+  if (stageId === "preview") {
+    return state.confirmed ? "已确认" : "有风险";
+  }
+  return "未填";
+}
+
+function renderStageNav() {
+  const input = readForm();
+  stageNav.querySelectorAll("[data-stage]").forEach((button) => {
+    const stageId = button.getAttribute("data-stage");
+    const stage = stages.find((item) => item.id === stageId);
+    const status = computeStageStatus(stageId, input);
+    button.classList.toggle("active", stageId === state.currentStage);
+    button.setAttribute("aria-current", stageId === state.currentStage ? "step" : "false");
+    button.setAttribute("data-stage-status", status);
+    button.innerHTML = `<strong>${escapeHtml(stage.label)}</strong><span>${escapeHtml(status)}</span>`;
+  });
+}
+
+function renderWorkspaceSummary() {
+  const input = readForm();
+  const usedFiles = state.files.filter((file) => file.layout_role !== "unused").length;
+  const captionedFiles = state.files.filter((file) => file.caption).length;
+  workspaceSummary.innerHTML = `
+    <h2>工作台摘要</h2>
+    <dl>
+      <div><dt>日期</dt><dd>${escapeHtml(input.date || "未填")}</dd></div>
+      <div><dt>栏目</dt><dd>${escapeHtml(kindLabel(input.kind))}</dd></div>
+      <div><dt>素材</dt><dd>${state.files.length} 个在用 / ${state.deletedFiles.length} 个已删</dd></div>
+      <div><dt>版位</dt><dd>${usedFiles} 个参与排版</dd></div>
+      <div><dt>说明</dt><dd>${captionedFiles} 个已写图片说明</dd></div>
+      <div><dt>确认</dt><dd>${state.confirmed ? "已确认" : "未确认"}</dd></div>
+    </dl>
+  `;
 }
 
 function buildDraftMarkdown(input = readForm()) {
@@ -487,11 +600,14 @@ function downloadBlob(filename, blob) {
 function updatePreview() {
   preview.textContent = buildDraftMarkdown();
   renderVisualPreview();
+  renderStageNav();
+  renderWorkspaceSummary();
   updateExportState();
 }
 
 function renderVisualPreview() {
   const input = readForm();
+  const bodyPoints = htmlList(toLines(input.copy.body_points));
   const materialList = state.files
     .map((file, index) => {
       const image = file.preview_url
@@ -515,6 +631,8 @@ function renderVisualPreview() {
       <span>确认预览</span>
       <h3>${escapeHtml(input.copy.title || input.title_hint || "未填写标题")}</h3>
       <p>${escapeHtml(input.copy.intro || input.summary || "未填写导语")}</p>
+      <strong>正文要点</strong>
+      ${bodyPoints}
       <p>${escapeHtml(input.copy.outro || "未填写结尾文案")}</p>
     </div>
     <div class="preview-rules">
@@ -538,6 +656,7 @@ function moveFile(id, direction) {
   state.files.splice(targetIndex, 0, item);
   markUnconfirmed();
   renderFiles();
+  renderLayoutWorkbench();
   updatePreview();
 }
 
@@ -548,6 +667,7 @@ function deleteFile(id) {
   state.deletedFiles.push({ deleted_at: new Date().toISOString(), index, item });
   markUnconfirmed();
   renderFiles();
+  renderLayoutWorkbench();
   renderDeletedZone();
   updatePreview();
 }
@@ -559,13 +679,14 @@ function undoDelete() {
   state.files.splice(index, 0, deleted.item);
   markUnconfirmed();
   renderFiles();
+  renderLayoutWorkbench();
   renderDeletedZone();
   updatePreview();
 }
 
 function updateExportState() {
-  zipButton.disabled = !state.confirmed;
-  zipButton.textContent = state.confirmed ? "导出完整素材包 ZIP" : "确认预览后导出 ZIP";
+  zipButton.disabled = !state.confirmed || state.currentStage !== "preview";
+  zipButton.textContent = state.confirmed && state.currentStage === "preview" ? "导出完整素材包 ZIP" : "确认预览后导出 ZIP";
 }
 
 function markUnconfirmed() {
@@ -745,7 +866,21 @@ fileList.addEventListener("input", (event) => {
   updateFileField(id, field, input.value);
 });
 
+layoutWorkbench.addEventListener("input", (event) => {
+  const input = event.target;
+  const id = input.getAttribute("data-file-id");
+  const field = input.getAttribute("data-file-field");
+  if (!id || !field) return;
+  updateFileField(id, field, input.value);
+});
+
 fileList.addEventListener("change", (event) => {
+  const input = event.target;
+  const stageId = input.getAttribute("data-stage");
+  if (stageId) setStage(stageId);
+});
+
+layoutWorkbench.addEventListener("change", (event) => {
   const input = event.target;
   const id = input.getAttribute("data-file-id");
   const field = input.getAttribute("data-file-field");
@@ -755,19 +890,52 @@ fileList.addEventListener("change", (event) => {
 
 fileList.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-file-action]");
+  const stageButton = event.target.closest("button[data-stage]");
+  if (stageButton) {
+    setStage(stageButton.getAttribute("data-stage"));
+    return;
+  }
+  if (!button) return;
+  const id = button.getAttribute("data-file-id");
+  const action = button.getAttribute("data-file-action");
+  if (action === "delete") deleteFile(id);
+});
+
+layoutWorkbench.addEventListener("click", (event) => {
+  const stageButton = event.target.closest("button[data-stage]");
+  if (stageButton) {
+    setStage(stageButton.getAttribute("data-stage"));
+    return;
+  }
+  const button = event.target.closest("button[data-file-action]");
   if (!button) return;
   const id = button.getAttribute("data-file-id");
   const action = button.getAttribute("data-file-action");
   if (action === "move-up") moveFile(id, -1);
   if (action === "move-down") moveFile(id, 1);
-  if (action === "delete") deleteFile(id);
 });
 
 undoDeleteButton.addEventListener("click", undoDelete);
 
+stageNav.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-stage]");
+  if (!button) return;
+  setStage(button.getAttribute("data-stage"));
+});
+
+prevStageButton.addEventListener("click", () => {
+  const index = stages.findIndex((stage) => stage.id === state.currentStage);
+  setStage(stages[Math.max(0, index - 1)].id);
+});
+
+nextStageButton.addEventListener("click", () => {
+  const index = stages.findIndex((stage) => stage.id === state.currentStage);
+  setStage(stages[Math.min(stages.length - 1, index + 1)].id);
+});
+
 form.addEventListener("input", (event) => {
   if (event.target === confirmExport) {
-    state.confirmed = confirmExport.checked;
+    state.confirmed = confirmExport.checked && state.currentStage === "preview";
   } else {
     markUnconfirmed();
   }
@@ -801,5 +969,6 @@ manifestButton.addEventListener("click", () => {
 window.addEventListener("beforeunload", releasePreviewUrls);
 
 renderFiles();
+renderLayoutWorkbench();
 renderDeletedZone();
-updatePreview();
+setStage(state.currentStage);

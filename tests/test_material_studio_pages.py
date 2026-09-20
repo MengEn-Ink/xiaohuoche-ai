@@ -30,6 +30,12 @@ def test_material_studio_states_local_only_privacy_contract() -> None:
     assert "实现预览" in html
     assert "确认预览后导出" in html
     assert "素材回收区" in html
+    assert "分页工作台" in html
+    assert "stage-nav" in html
+    assert "工作台摘要" in html
+    assert "上一步" in html
+    assert "下一步" in html
+    assert "我确认后续实现必须以当前最终预览为准" in html
     assert "fetch(" not in script
     assert "XMLHttpRequest" not in script
 
@@ -89,3 +95,32 @@ def test_material_studio_supports_ordering_delete_undo_and_confirmed_export() ->
     assert "function updateExportState" in script
     assert "confirm-export" in html
     assert "zipButton.disabled = !state.confirmed" in script
+
+
+def test_material_studio_uses_paged_workbench_flow() -> None:
+    html = (PAGE_ROOT / "index.html").read_text(encoding="utf-8")
+    script = (PAGE_ROOT / "app.js").read_text(encoding="utf-8")
+
+    assert 'data-stage="activity"' in html
+    assert 'data-stage="materials"' in html
+    assert 'data-stage="layout"' in html
+    assert 'data-stage="copy"' in html
+    assert 'data-stage="preview"' in html
+    assert 'data-stage-panel="activity"' in html
+    assert 'data-stage-panel="materials"' in html
+    assert 'data-stage-panel="layout"' in html
+    assert 'data-stage-panel="copy"' in html
+    assert 'data-stage-panel="preview"' in html
+    assert "活动信息" in html
+    assert "素材池" in html
+    assert "排版台" in html
+    assert "文案批注" in html
+    assert "最终预览" in html
+    assert "currentStage" in script
+    assert "function setStage" in script
+    assert "function computeStageStatus" in script
+    assert "function renderStageNav" in script
+    assert "function renderWorkspaceSummary" in script
+    assert "data-stage-panel" in script
+    assert "data-stage-status" in script
+    assert "state.currentStage === \"preview\"" in script

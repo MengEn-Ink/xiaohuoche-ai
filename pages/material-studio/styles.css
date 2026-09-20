@@ -77,10 +77,53 @@ h2 {
   font-weight: 900;
 }
 
-.grid {
+.stage-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 24px 0;
+  padding: 8px;
+  border: 4px solid var(--line);
+  background: var(--paper);
+  box-shadow: 8px 8px 0 var(--line);
+}
+
+.stage-nav button {
+  display: grid;
+  gap: 4px;
+  min-height: 74px;
+  padding: 10px;
+  background: white;
+  color: var(--ink);
+  text-align: left;
+}
+
+.stage-nav button.active {
+  background: var(--yellow);
+}
+
+.stage-nav button span {
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.stage-nav button[data-stage-status="有风险"] span {
+  color: var(--red);
+}
+
+.stage-nav button[data-stage-status="已确认"] {
+  background: #b9ff80;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
   gap: 20px;
+  align-items: start;
 }
 
 .panel {
@@ -90,9 +133,74 @@ h2 {
   box-shadow: 8px 8px 0 var(--line);
 }
 
-.copydesk,
-.preview-panel {
-  grid-column: 1 / -1;
+.stage-panel {
+  min-height: 560px;
+}
+
+.stage-panel[hidden] {
+  display: none;
+}
+
+.stage-kicker {
+  display: inline-block;
+  margin-bottom: 10px;
+  border: 3px solid var(--line);
+  background: var(--yellow);
+  padding: 5px 9px;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.panel-note {
+  font-family: "Helvetica Neue", sans-serif;
+  line-height: 1.6;
+}
+
+.workspace-summary {
+  position: sticky;
+  top: 122px;
+  grid-column: 2;
+  grid-row: 1;
+  border: 4px solid var(--line);
+  background: #111;
+  color: white;
+  padding: 18px;
+  box-shadow: 8px 8px 0 var(--line);
+  font-family: "Helvetica Neue", sans-serif;
+}
+
+.workspace-summary dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.workspace-summary div {
+  border: 2px solid white;
+  padding: 10px;
+}
+
+.workspace-summary dt {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--yellow);
+}
+
+.workspace-summary dd {
+  margin: 3px 0 0;
+  font-weight: 900;
+}
+
+.stage-panel,
+.stage-footer {
+  grid-column: 1;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 label {
@@ -214,6 +322,41 @@ button:disabled:hover {
 .file-controls button {
   padding: 9px 10px;
   background: var(--ink);
+}
+
+.layout-workbench {
+  display: grid;
+  gap: 14px;
+}
+
+.layout-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 14px;
+  border: 3px solid var(--line);
+  background: var(--paper);
+  padding: 12px;
+  font-family: "Helvetica Neue", sans-serif;
+}
+
+.layout-body {
+  display: grid;
+  gap: 10px;
+}
+
+.layout-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.layout-title span {
+  border: 2px solid var(--line);
+  background: var(--yellow);
+  padding: 4px 8px;
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .deleted-zone {
@@ -339,14 +482,49 @@ pre {
   line-height: 1.5;
 }
 
+.stage-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stage-footer button {
+  background: var(--ink);
+}
+
 @media (max-width: 760px) {
-  .privacy-strip,
-  .grid,
+  .privacy-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-nav {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .stage-nav button {
+    min-width: 132px;
+  }
+
+  .workspace,
   .actions,
   .file-head,
   .file-controls,
-  .preview-item {
+  .preview-item,
+  .layout-row,
+  .two-column,
+  .stage-footer {
     grid-template-columns: 1fr;
+  }
+
+  .workspace-summary,
+  .stage-panel,
+  .stage-footer {
+    grid-column: 1;
+  }
+
+  .workspace-summary {
+    position: static;
   }
 
   .masthead,

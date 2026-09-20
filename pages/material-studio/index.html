@@ -11,7 +11,7 @@
       <section class="masthead">
         <p class="eyebrow">XZQ MATERIAL STUDIO</p>
         <h1>素材采集台</h1>
-        <p class="lead">本地处理，不上传。把活动信息、Strava 链接和照片清单整理成流水线可读的采集包。</p>
+        <p class="lead">分页工作台，本地处理，不上传。按活动信息、素材池、排版台、文案批注和最终预览逐步确认采集包。</p>
       </section>
 
       <section class="privacy-strip" aria-label="隐私边界">
@@ -21,24 +21,39 @@
         <span>导出后本地投喂</span>
       </section>
 
-      <form id="material-form" class="grid" autocomplete="off">
-        <section class="panel">
+      <nav id="stage-nav" class="stage-nav" aria-label="分页工作台步骤">
+        <button type="button" data-stage="activity">活动信息</button>
+        <button type="button" data-stage="materials">素材池</button>
+        <button type="button" data-stage="layout">排版台</button>
+        <button type="button" data-stage="copy">文案批注</button>
+        <button type="button" data-stage="preview">最终预览</button>
+      </nav>
+
+      <form id="material-form" class="workspace" autocomplete="off">
+        <aside id="workspace-summary" class="workspace-summary" aria-live="polite">
+          <h2>工作台摘要</h2>
+        </aside>
+
+        <section class="panel stage-panel" data-stage-panel="activity">
+          <p class="stage-kicker">STEP 01</p>
           <h2>活动信息</h2>
-          <label>
-            日期
-            <input id="date" name="date" type="text" placeholder="0913" required />
-          </label>
-          <label>
-            栏目
-            <select id="kind" name="kind">
-              <option value="ribao">日报</option>
-              <option value="wanbao">晚报</option>
-              <option value="zaobao">早报</option>
-              <option value="subao">速报</option>
-              <option value="kuaixun">快讯</option>
-              <option value="tuanjian">团建</option>
-            </select>
-          </label>
+          <div class="two-column">
+            <label>
+              日期
+              <input id="date" name="date" type="text" placeholder="0913" required />
+            </label>
+            <label>
+              栏目
+              <select id="kind" name="kind">
+                <option value="ribao">日报</option>
+                <option value="wanbao">晚报</option>
+                <option value="zaobao">早报</option>
+                <option value="subao">速报</option>
+                <option value="kuaixun">快讯</option>
+                <option value="tuanjian">团建</option>
+              </select>
+            </label>
+          </div>
           <label>
             标题方向
             <input id="title-hint" name="titleHint" type="text" placeholder="例如：妙峰山赛后复盘" />
@@ -47,30 +62,6 @@
             活动摘要
             <textarea id="summary" name="summary" rows="7" placeholder="时间、地点、路线、天气、结果、现场氛围"></textarea>
           </label>
-        </section>
-
-        <section class="panel copydesk">
-          <h2>文案工作台</h2>
-          <label>
-            成稿标题
-            <input id="final-title" name="finalTitle" type="text" placeholder="确认后作为后续实现标题" />
-          </label>
-          <label>
-            导语
-            <textarea id="intro-copy" name="introCopy" rows="4" placeholder="开头怎么进入故事，哪些情绪必须保留"></textarea>
-          </label>
-          <label>
-            正文要点
-            <textarea id="body-points" name="bodyPoints" rows="6" placeholder="每行一个要点：路线、人物、梗、数据、转折"></textarea>
-          </label>
-          <label>
-            结尾文案
-            <textarea id="outro-copy" name="outroCopy" rows="4" placeholder="收束、感谢、下次活动或口号"></textarea>
-          </label>
-        </section>
-
-        <section class="panel">
-          <h2>数据与线索</h2>
           <label>
             Strava 链接
             <textarea id="strava-links" name="stravaLinks" rows="5" placeholder="每行一个活动、俱乐部或路段链接"></textarea>
@@ -83,14 +74,11 @@
             隐私注意事项
             <textarea id="privacy-notes" name="privacyNotes" rows="4" placeholder="需要打码的人名、车牌、工作地点、无关路人"></textarea>
           </label>
-          <label>
-            全局 AI 要求
-            <textarea id="ai-instructions" name="aiInstructions" rows="5" placeholder="风格、必须保留的梗、禁用表达、隐私处理、排版注意事项"></textarea>
-          </label>
         </section>
 
-        <section class="panel files">
-          <h2>照片与截图</h2>
+        <section class="panel stage-panel files" data-stage-panel="materials" hidden>
+          <p class="stage-kicker">STEP 02</p>
+          <h2>素材池</h2>
           <label class="drop">
             <input id="files" type="file" multiple accept="image/*" />
             <strong>选择本地图片</strong>
@@ -109,12 +97,46 @@
           </div>
         </section>
 
-        <section class="panel output">
-          <h2>导出</h2>
-          <p>推荐导出完整素材包 ZIP。包内包含 `draft.md`、`instructions.md`、`layout.json`、`manifest.json`、`preview/preview.html` 和原始素材文件，原图字节不压缩、不缩放、不改像素。</p>
+        <section class="panel stage-panel" data-stage-panel="layout" hidden>
+          <p class="stage-kicker">STEP 03</p>
+          <h2>排版台</h2>
+          <p class="panel-note">调整素材顺序、版位、图片说明和单图 AI 批注。删除请回到素材池处理。</p>
+          <div id="layout-workbench" class="layout-workbench" aria-live="polite"></div>
+        </section>
+
+        <section class="panel stage-panel copydesk" data-stage-panel="copy" hidden>
+          <p class="stage-kicker">STEP 04</p>
+          <h2>文案批注 / 文案工作台</h2>
+          <label>
+            成稿标题
+            <input id="final-title" name="finalTitle" type="text" placeholder="确认后作为后续实现标题" />
+          </label>
+          <label>
+            导语
+            <textarea id="intro-copy" name="introCopy" rows="4" placeholder="开头怎么进入故事，哪些情绪必须保留"></textarea>
+          </label>
+          <label>
+            正文要点
+            <textarea id="body-points" name="bodyPoints" rows="6" placeholder="每行一个要点：路线、人物、梗、数据、转折"></textarea>
+          </label>
+          <label>
+            结尾文案
+            <textarea id="outro-copy" name="outroCopy" rows="4" placeholder="收束、感谢、下次活动或口号"></textarea>
+          </label>
+          <label>
+            全局 AI 要求
+            <textarea id="ai-instructions" name="aiInstructions" rows="5" placeholder="风格、必须保留的梗、禁用表达、隐私处理、排版注意事项"></textarea>
+          </label>
+        </section>
+
+        <section class="panel stage-panel output preview-stage" data-stage-panel="preview" hidden>
+          <p class="stage-kicker">STEP 05</p>
+          <h2>最终预览</h2>
+          <p>实现预览是导出包的契约。后续实现必须按这里的文案、排序、版位、图片说明、AI 要求和隐私提醒执行。</p>
+          <div id="visual-preview" class="visual-preview" aria-label="实现预览"></div>
           <label class="confirm-line">
             <input id="confirm-export" type="checkbox" />
-            确认预览后导出，后续实现按这里的文案、排序、版位和 AI 要求执行。
+            我确认后续实现必须以当前最终预览为准。确认预览后导出完整素材包 ZIP。
           </label>
           <div class="actions">
             <button type="button" id="download-zip" disabled>导出完整素材包 ZIP</button>
@@ -122,13 +144,13 @@
             <button type="button" id="download-manifest">下载 manifest.json</button>
           </div>
           <p class="package-shape">ZIP 结构：`日期-栏目/draft.md`、`instructions.md`、`layout.json`、`manifest.json`、`preview/preview.html`、`materials/original/...`</p>
-        </section>
-
-        <section class="panel output preview-panel">
-          <h2>实现预览</h2>
-          <div id="visual-preview" class="visual-preview" aria-label="实现预览"></div>
           <pre id="preview" aria-label="draft 预览"></pre>
         </section>
+
+        <div class="stage-footer">
+          <button type="button" id="prev-stage">上一步</button>
+          <button type="button" id="next-stage">下一步</button>
+        </div>
       </form>
     </main>
     <script src="./app.js"></script>
