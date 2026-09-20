@@ -119,6 +119,10 @@ h2 {
   background: #b9ff80;
 }
 
+body.preview-mode .stage-nav {
+  position: static;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 280px;
@@ -190,6 +194,19 @@ h2 {
 .workspace-summary dd {
   margin: 3px 0 0;
   font-weight: 900;
+}
+
+.workspace.preview-mode {
+  grid-template-columns: 1fr;
+}
+
+.workspace.preview-mode .workspace-summary {
+  display: none;
+}
+
+.workspace.preview-mode .preview-stage,
+.workspace.preview-mode .stage-footer {
+  grid-column: 1 / -1;
 }
 
 .stage-panel,

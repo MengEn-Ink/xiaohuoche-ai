@@ -131,3 +131,14 @@ def test_material_studio_file_field_inputs_do_not_double_render() -> None:
 
     assert 'event.target.hasAttribute("data-file-field")' in script
     assert "return;" in script
+
+
+def test_material_studio_preview_stage_does_not_overlay_summary() -> None:
+    style = (PAGE_ROOT / "styles.css").read_text(encoding="utf-8")
+    script = (PAGE_ROOT / "app.js").read_text(encoding="utf-8")
+
+    assert 'form.classList.toggle("preview-mode", stageId === "preview")' in script
+    assert 'document.body.classList.toggle("preview-mode", stageId === "preview")' in script
+    assert ".workspace.preview-mode .workspace-summary" in style
+    assert ".workspace.preview-mode .preview-stage" in style
+    assert "body.preview-mode .stage-nav" in style

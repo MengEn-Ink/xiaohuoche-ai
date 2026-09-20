@@ -228,6 +228,8 @@ function renderDeletedZone() {
 function setStage(stageId) {
   if (!stages.some((stage) => stage.id === stageId)) return;
   state.currentStage = stageId;
+  form.classList.toggle("preview-mode", stageId === "preview");
+  document.body.classList.toggle("preview-mode", stageId === "preview");
   document.querySelectorAll("[data-stage-panel]").forEach((panel) => {
     panel.hidden = panel.getAttribute("data-stage-panel") !== stageId;
   });
