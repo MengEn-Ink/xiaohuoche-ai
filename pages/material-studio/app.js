@@ -934,6 +934,9 @@ nextStageButton.addEventListener("click", () => {
 });
 
 form.addEventListener("input", (event) => {
+  if (event.target.hasAttribute("data-file-field")) {
+    return;
+  }
   if (event.target === confirmExport) {
     state.confirmed = confirmExport.checked && state.currentStage === "preview";
   } else {

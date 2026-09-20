@@ -124,3 +124,10 @@ def test_material_studio_uses_paged_workbench_flow() -> None:
     assert "data-stage-panel" in script
     assert "data-stage-status" in script
     assert "state.currentStage === \"preview\"" in script
+
+
+def test_material_studio_file_field_inputs_do_not_double_render() -> None:
+    script = (PAGE_ROOT / "app.js").read_text(encoding="utf-8")
+
+    assert 'event.target.hasAttribute("data-file-field")' in script
+    assert "return;" in script
