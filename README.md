@@ -1,46 +1,46 @@
 # Xiaohuoche AI
 
-`xiaohuoche-ai` is an AI-assisted publishing pipeline for cycling clubs. It turns approved ride materials into WeChat Official Account draft articles: collect materials, generate a styled script, review sensitive details, render long images, and optionally push the result into the WeChat draft box.
+`xiaohuoche-ai` 是面向骑行社群的 AI 辅助发布流水线。它把已授权的骑行素材整理成微信公众号草稿：采集素材、生成文案、审阅敏感细节、渲染长图，并可选推送到微信公众号草稿箱。
 
-This GitHub repository is a sanitized source release. It does not include private group chat screenshots, rider photos, historical ribao outputs, generated PNGs, local data, AIME site code, or service credentials.
+这个 GitHub 仓库是脱敏后的源码发布版。仓库不包含私有群聊截图、骑友照片、历史日报成品、导出 PNG、本地数据、AIME 站点代码或任何服务凭证。
 
-## What It Does
+## 功能概览
 
 ```text
-materials -> collect -> write -> review -> render -> draft box -> manual publish
-            Strava     LLM     checklist   HTML/PNG   WeChat API
+素材 -> 采集 -> 写作 -> 审阅 -> 渲染 -> 草稿箱 -> 人工发布
+       Strava   LLM    清单    HTML/PNG  微信 API
 ```
 
-The pipeline is designed around a conservative privacy model:
+流水线采用保守的隐私模型：
 
-- no reverse-engineered personal WeChat bot;
-- no invented ride stats or PR data;
-- no automatic public publishing for personal-subject WeChat accounts;
-- no committed secrets or real private materials.
+- 不使用逆向个人微信机器人；
+- 不编造骑行数据、PR 或成绩；
+- 不对个人主体微信公众号做自动群发；
+- 不提交密钥或真实私有素材。
 
-## Repository Layout
+## 仓库结构
 
-| Path | Purpose |
+| 路径 | 用途 |
 | --- | --- |
-| `pipeline.py` | CLI entry point for collection, generation, review, rendering, checks, and draft push. |
-| `xzq/collector/` | Material inbox handling, screenshot transcription, and Strava API integration. |
-| `xzq/writer/` | Prompt assembly, style loading, and offline fallback generation. |
-| `xzq/reviewer/` | Review state, annotations, checklist, revisions, and preview server. |
-| `xzq/renderer/` | HTML/raw/collage rendering, image identity checks, cutouts, stickers, and long-image export. |
-| `xzq/publisher/` | WeChat access token, media upload, and draft creation. |
-| `style/` | Public writing templates, sample few-shot style material, font license files, and rendering templates. |
-| `.trae/skills/xiaohuoche-ribao-html/` | Reusable local skill for hand-composed ribao HTML and PNG export. |
-| `tests/` | Python regression tests for core logic and release gates. |
-| `scripts/` | Release and open-source snapshot utilities. |
-| `docs/` | Public setup and authorization documentation. |
+| `pipeline.py` | 采集、生成、审阅、渲染、检查和草稿推送的 CLI 入口。 |
+| `xzq/collector/` | 素材 inbox、截图转写和 Strava API 集成。 |
+| `xzq/writer/` | Prompt 组装、风格加载和离线兜底生成。 |
+| `xzq/reviewer/` | 审阅状态、批注、检查清单、修订和预览服务。 |
+| `xzq/renderer/` | HTML/raw/collage 渲染、图片身份检查、抠图、贴纸和长图导出。 |
+| `xzq/publisher/` | 微信 access token、素材上传和草稿创建。 |
+| `style/` | 可公开的写作模板、脱敏 few-shot、字体许可和渲染模板。 |
+| `.trae/skills/xiaohuoche-ribao-html/` | 可复用的本地 skill，用于手工拼贴日报 HTML 和导出 PNG。 |
+| `tests/` | 核心逻辑和发布门禁的 Python 回归测试。 |
+| `scripts/` | 发布脚本和开源快照工具。 |
+| `docs/` | 公开安装、授权和发布文档。 |
 
-Excluded from the public source snapshot: `aime-site/`, `data/`, `docs/ribao-html/`, historical generated images, ZIP packages, and local environment files.
+公开源码快照排除：`aime-site/`、`data/`、`docs/ribao-html/`、历史生成图片、ZIP 包和本地环境文件。
 
-The default ribao visual language follows the XZQ hand-composed style: 单一天蓝底, high-contrast outlined headline text, cutout subjects, stickers, and dense editorial layout.
+默认日报视觉语言遵循 XZQ 手工拼贴风格：单一天蓝底、高对比描边标题、抠图主体、贴纸和高密度编辑版式。
 
-## Quick Start
+## 快速开始
 
-Use Python 3.9+.
+需要 Python 3.9+。
 
 ```bash
 python3 -m venv .venv
@@ -50,13 +50,13 @@ cp .env.example .env
 cp config.example.yaml config.yaml
 ```
 
-Run the offline path first. It does not need WeChat, Strava, or LLM credentials.
+建议先跑离线路径。离线运行不需要微信、Strava 或 LLM 凭证。
 
 ```bash
 python3 pipeline.py run --offline --date 0913 --kind ribao
 ```
 
-For a normal local workflow, put approved photos, screenshots, and a short `draft.md` in the inbox directory configured by `XHC_INBOX_DIR` or `config.yaml`, then run:
+常规本地流程：把已授权的照片、截图和简短 `draft.md` 放进 `XHC_INBOX_DIR` 或 `config.yaml` 配置的 inbox 目录，然后执行：
 
 ```bash
 python3 pipeline.py collect --date 0913 --kind ribao
@@ -66,17 +66,17 @@ python3 pipeline.py approve 0913-ribao
 python3 pipeline.py render 0913-ribao
 ```
 
-Rendering long images requires Playwright Chromium. Install it only when you need image export:
+长图渲染需要 Playwright Chromium。只有需要导出图片时再安装：
 
 ```bash
 python3 -m playwright install chromium
 ```
 
-## Optional External Services
+## 可选外部服务
 
-All credentials live in `.env`, which must stay untracked.
+所有凭证都放在 `.env` 中，且必须保持未跟踪状态。
 
-LLM generation:
+LLM 生成：
 
 ```text
 LLM_BASE_URL=
@@ -85,7 +85,7 @@ LLM_MODEL=
 LLM_VISION_MODEL=
 ```
 
-Strava data:
+Strava 数据：
 
 ```text
 STRAVA_CLIENT_ID=
@@ -94,29 +94,29 @@ STRAVA_REFRESH_TOKEN=
 STRAVA_CLUB_ID=
 ```
 
-WeChat draft box:
+微信公众号草稿箱：
 
 ```text
 WECHAT_APP_ID=
 WECHAT_APP_SECRET=
 ```
 
-Run a local capability check without printing secrets:
+运行本地能力检查，命令不会打印密钥：
 
 ```bash
 python3 pipeline.py doctor
 ```
 
-More setup detail:
+更多说明：
 
-- [Local development](docs/local-development.md)
-- [WeChat and Strava authorization](docs/wechat-strava-auth.md)
-- [Strava notes](docs/strava.md)
-- [GitHub source snapshot publishing](docs/github.md)
+- [本地开发](docs/local-development.md)
+- [微信与 Strava 授权](docs/wechat-strava-auth.md)
+- [Strava 说明](docs/strava.md)
+- [GitHub 源码快照发布](docs/github.md)
 
-## Review And Privacy
+## 审阅与隐私
 
-Generated drafts should pass human review before rendering or uploading:
+生成草稿在渲染或上传前必须经过人工审阅：
 
 ```bash
 python3 pipeline.py preview 0913-ribao
@@ -124,17 +124,17 @@ python3 pipeline.py review 0913-ribao --check-all
 python3 pipeline.py approve 0913-ribao
 ```
 
-Before publication, confirm:
+发布前确认：
 
-- people shown in photos agreed to appear;
-- names, workplaces, license plates, and unrelated people are redacted where needed;
-- ride metrics match Strava or another trusted source;
-- jokes remain within the group context and avoid personal attacks;
-- exported images do not reveal private chat context.
+- 照片中可识别人物已同意出现；
+- 姓名、工作地点、车牌和无关路人已按需打码或移除；
+- 骑行数据来自 Strava 或其他可信来源；
+- 梗和玩笑限定在群内语境，避免人身攻击；
+- 导出图片不会泄露私密聊天上下文。
 
-Personal-subject WeChat Official Accounts can create drafts through the official API, but final mass sending still requires manual action in the WeChat app or admin console.
+个人主体微信公众号可以通过官方 API 创建草稿，但最终群发仍需在微信 App 或公众号后台人工完成。
 
-## Development Checks
+## 开发检查
 
 ```bash
 python3 -m compileall -q xzq pipeline.py scripts
@@ -143,11 +143,11 @@ python3 scripts/build_open_source_snapshot.py --output /tmp/xiaohuoche-ai-open-s
 python3 scripts/check_open_source_snapshot.py /tmp/xiaohuoche-ai-open-source
 ```
 
-The snapshot checker intentionally fails if run against a private working tree that still contains excluded directories such as `aime-site/`, `data/`, or `docs/ribao-html/`.
+快照检查器如果直接跑在仍包含 `aime-site/`、`data/` 或 `docs/ribao-html/` 的私有工作树上，会按设计失败。
 
-## Open Source Boundary
+## 开源边界
 
-The public GitHub repository is built from a whitelist by:
+公开 GitHub 仓库由白名单快照生成：
 
 ```bash
 python3 scripts/build_open_source_snapshot.py \
@@ -155,12 +155,12 @@ python3 scripts/build_open_source_snapshot.py \
   --force
 ```
 
-That snapshot excludes private materials and local integrations before it is pushed to GitHub. See [docs/github.md](docs/github.md) for the publication flow.
+该快照会在推送 GitHub 前排除私有素材和本地集成。发布流程见 [docs/github.md](docs/github.md)。
 
-## License
+## 许可证
 
-MIT, see [LICENSE](LICENSE).
+MIT，见 [LICENSE](LICENSE)。
 
-## Trademark Notice
+## 商标声明
 
-This project is an unofficial third-party tool. Strava and WeChat are trademarks of their respective owners. This project is not affiliated with, sponsored by, or endorsed by Strava, Inc. or Tencent.
+本项目是非官方第三方工具。Strava 和 WeChat 是各自权利人的商标。本项目不隶属于 Strava, Inc. 或 Tencent，也未获得其赞助或背书。

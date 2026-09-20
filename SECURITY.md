@@ -1,30 +1,30 @@
-# Security Policy
+# 安全政策
 
-## Supported Scope
+## 支持范围
 
-Security reports are accepted for the open-source `xiaohuoche-ai` source snapshot: Python pipeline code, rendering scripts, validation tools, and documentation.
+安全问题报告适用于公开的 `xiaohuoche-ai` 源码快照：Python 流水线代码、渲染脚本、校验工具和文档。
 
-The public repository does not include private riding materials, historical WeChat drafts, deployed AIME site code, local data, or service credentials.
+公开仓库不包含私有骑行素材、历史微信公众号草稿、已部署的 AIME 站点代码、本地数据或服务凭证。
 
-## Reporting
+## 报告方式
 
-Please report vulnerabilities privately through the repository owner's GitHub contact channel. Do not publish exploit details, tokens, screenshots, or private user materials in public issues.
+请通过仓库所有者的 GitHub 联系渠道私下报告漏洞。不要在公开 issue 中发布利用细节、token、截图或私有用户素材。
 
-Include:
+报告中建议包含：
 
-- affected version or commit;
-- reproduction steps using synthetic data;
-- expected and actual behavior;
-- impact assessment;
-- any suggested fix.
+- 受影响版本或 commit；
+- 使用合成数据的复现步骤；
+- 期望行为和实际行为；
+- 影响范围判断；
+- 可选的修复建议。
 
-## Secret Or Private Material Exposure
+## 密钥或私有素材泄露
 
-If you discover a committed secret or private material:
+如果发现已提交的密钥或私有素材：
 
-1. Stop sharing the URL publicly.
-2. Report the exact path and commit privately.
-3. Rotate the affected credential immediately if it belongs to you.
-4. Remove or redact the material before continuing development.
+1. 停止公开传播对应 URL。
+2. 私下报告具体路径和 commit。
+3. 如果凭证属于你，请立即轮换。
+4. 继续开发前先移除或打码相关材料。
 
-The project treats real group chat screenshots, personal photos, Strava private activity data, WeChat credentials, LLM keys, and token caches as non-public material.
+本项目把真实群聊截图、个人照片、Strava 私密活动数据、微信凭证、LLM key 和 token cache 都视为非公开材料。
