@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>辛庄桥小火车素材采集台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="masthead">
+        <p class="eyebrow">XZQ MATERIAL STUDIO</p>
+        <h1>素材采集台</h1>
+        <p class="lead">本地处理，不上传。把活动信息、Strava 链接和照片清单整理成流水线可读的采集包。</p>
+      </section>
+
+      <section class="privacy-strip" aria-label="隐私边界">
+        <span>浏览器本地读取</span>
+        <span>不上传图片</span>
+        <span>不保存密钥</span>
+        <span>导出后本地投喂</span>
+      </section>
+
+      <form id="material-form" class="grid" autocomplete="off">
+        <section class="panel">
+          <h2>活动信息</h2>
+          <label>
+            日期
+            <input id="date" name="date" type="text" placeholder="0913" required />
+          </label>
+          <label>
+            栏目
+            <select id="kind" name="kind">
+              <option value="ribao">日报</option>
+              <option value="wanbao">晚报</option>
+              <option value="zaobao">早报</option>
+              <option value="subao">速报</option>
+              <option value="kuaixun">快讯</option>
+              <option value="tuanjian">团建</option>
+            </select>
+          </label>
+          <label>
+            标题方向
+            <input id="title-hint" name="titleHint" type="text" placeholder="例如：妙峰山赛后复盘" />
+          </label>
+          <label>
+            活动摘要
+            <textarea id="summary" name="summary" rows="7" placeholder="时间、地点、路线、天气、结果、现场氛围"></textarea>
+          </label>
+        </section>
+
+        <section class="panel">
+          <h2>数据与线索</h2>
+          <label>
+            Strava 链接
+            <textarea id="strava-links" name="stravaLinks" rows="5" placeholder="每行一个活动、俱乐部或路段链接"></textarea>
+          </label>
+          <label>
+            人物与梗
+            <textarea id="people-notes" name="peopleNotes" rows="5" placeholder="谁出场、谁破风、谁冲刺、哪些梗必须保留"></textarea>
+          </label>
+          <label>
+            隐私注意事项
+            <textarea id="privacy-notes" name="privacyNotes" rows="4" placeholder="需要打码的人名、车牌、工作地点、无关路人"></textarea>
+          </label>
+        </section>
+
+        <section class="panel files">
+          <h2>照片与截图</h2>
+          <label class="drop">
+            <input id="files" type="file" multiple accept="image/*" />
+            <strong>选择本地图片</strong>
+            <span>页面只读取文件名、大小、类型和尺寸，不上传文件。</span>
+          </label>
+          <div id="file-list" class="file-list" aria-live="polite"></div>
+        </section>
+
+        <section class="panel output">
+          <h2>导出</h2>
+          <p>把 `draft.md`、`manifest.json` 和真实图片放进本地 inbox，再运行流水线。</p>
+          <div class="actions">
+            <button type="button" id="download-draft">下载 draft.md</button>
+            <button type="button" id="download-manifest">下载 manifest.json</button>
+          </div>
+          <pre id="preview" aria-label="draft 预览"></pre>
+        </section>
+      </form>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>

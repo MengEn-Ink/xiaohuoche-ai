@@ -56,6 +56,23 @@ git push -u origin main
 
 如果目标仓库已经存在，必须先确认它属于预期账号，且描述中包含 `[xiaohuoche-ai]` 标记，再继续推送。
 
+## 发布 GitHub Pages
+
+公开快照包含 `pages/material-studio/` 和 `.github/workflows/pages.yml`。推送 `main` 后，GitHub Actions 会把素材采集台部署到 Pages：
+
+```text
+https://mengen-ink.github.io/xiaohuoche-ai/
+```
+
+如果 Pages 还没有启用，需要把仓库 Pages 来源设置为 GitHub Actions：
+
+```bash
+gh api -X POST repos/MengEn-Ink/xiaohuoche-ai/pages \
+  -f build_type=workflow
+```
+
+采集台是纯静态页面，只生成本地下载文件，不上传真实素材。
+
 ## 验证
 
 ```bash

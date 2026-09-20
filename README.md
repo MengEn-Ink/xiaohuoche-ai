@@ -72,6 +72,16 @@ python3 pipeline.py render 0913-ribao
 python3 -m playwright install chromium
 ```
 
+## 素材采集台
+
+公开仓库通过 GitHub Pages 提供一个纯静态素材采集台：
+
+```text
+https://mengen-ink.github.io/xiaohuoche-ai/
+```
+
+采集台只在浏览器本地处理内容，不上传照片、截图或密钥。它会导出 `draft.md` 和 `manifest.json`，你可以把这两个文件连同真实素材放入本地 inbox，再继续执行 `pipeline.py collect/generate/review/render`。
+
 ## 可选外部服务
 
 所有凭证都放在 `.env` 中，且必须保持未跟踪状态。

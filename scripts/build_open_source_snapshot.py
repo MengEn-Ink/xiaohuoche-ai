@@ -35,6 +35,7 @@ PUBLIC_FILES = (
 PUBLIC_DIRS = (
     ".github/workflows",
     ".trae/skills/xiaohuoche-ribao-html/references",
+    "pages",
     "style/fonts",
     "style/templates",
     "tests",
