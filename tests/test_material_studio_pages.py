@@ -21,6 +21,15 @@ def test_material_studio_states_local_only_privacy_contract() -> None:
     assert "下载 draft.md" in html
     assert "下载 manifest.json" in html
     assert "导出完整素材包 ZIP" in html
+    assert "文案工作台" in html
+    assert "成稿标题" in html
+    assert "导语" in html
+    assert "正文要点" in html
+    assert "结尾文案" in html
+    assert "全局 AI 要求" in html
+    assert "实现预览" in html
+    assert "确认预览后导出" in html
+    assert "素材回收区" in html
     assert "fetch(" not in script
     assert "XMLHttpRequest" not in script
 
@@ -48,3 +57,35 @@ def test_pages_workflow_publishes_material_studio_only() -> None:
     assert "pages/material-studio" in workflow
     assert "actions/upload-pages-artifact" in workflow
     assert "actions/deploy-pages" in workflow
+
+
+def test_material_studio_exports_preview_layout_and_instructions_contract() -> None:
+    script = (PAGE_ROOT / "app.js").read_text(encoding="utf-8")
+
+    assert "function buildLayoutJson" in script
+    assert "function buildInstructionsMarkdown" in script
+    assert "function buildPreviewHtml" in script
+    assert "instructions.md" in script
+    assert "layout.json" in script
+    assert "preview/preview.html" in script
+    assert "implementation_contract" in script
+    assert "source_of_truth" in script
+    assert "layout_role" in script
+    assert "caption" in script
+    assert "ai_instruction" in script
+
+
+def test_material_studio_supports_ordering_delete_undo_and_confirmed_export() -> None:
+    html = (PAGE_ROOT / "index.html").read_text(encoding="utf-8")
+    script = (PAGE_ROOT / "app.js").read_text(encoding="utf-8")
+
+    assert 'data-file-action="move-up"' in script
+    assert 'data-file-action="move-down"' in script
+    assert 'data-file-action="delete"' in script
+    assert 'id="undo-delete"' in html
+    assert "function moveFile" in script
+    assert "function deleteFile" in script
+    assert "function undoDelete" in script
+    assert "function updateExportState" in script
+    assert "confirm-export" in html
+    assert "zipButton.disabled = !state.confirmed" in script

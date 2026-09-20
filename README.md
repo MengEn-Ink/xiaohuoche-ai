@@ -80,21 +80,25 @@ python3 -m playwright install chromium
 https://mengen-ink.github.io/xiaohuoche-ai/
 ```
 
-采集台只在浏览器本地处理内容，不上传照片、截图或密钥。它会导出 `draft.md` 和 `manifest.json`，你可以把这两个文件连同真实素材放入本地 inbox，再继续执行 `pipeline.py collect/generate/review/render`。
+采集台只在浏览器本地处理内容，不上传照片、截图或密钥。上传素材后可在页面内预览、调整顺序、选择版位、修改文案，并补充全局或单图 AI 要求批注。确认预览后再导出素材包，后续实现应按预览中的文案、排序、版位、图片说明、AI 要求和隐私提醒执行。
 
 推荐使用“导出完整素材包 ZIP”。ZIP 会保持固定结构：
 
 ```text
 日期-栏目/
   draft.md
+  instructions.md
+  layout.json
   manifest.json
   README.txt
+  preview/
+    preview.html
   materials/
     original/
       原始文件或原目录结构
 ```
 
-`materials/original/` 中的图片按浏览器拿到的原始 File 字节写入，不经过 canvas，不压缩、不缩放、不改变像素大小。
+`instructions.md` 和 `layout.json` 记录已确认的文案、版位、素材顺序和 AI 批注；`preview/preview.html` 是人工复核用的实现预览。`materials/original/` 中的图片按浏览器拿到的原始 File 字节写入，不经过 canvas，不压缩、不缩放、不改变像素大小。
 
 ## 可选外部服务
 
