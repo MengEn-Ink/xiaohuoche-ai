@@ -22,6 +22,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
 
+      - name: Check open source snapshot
+        run: python scripts/check_open_source_snapshot.py .
+
       - name: Compile Python sources
         run: python -m compileall -q xzq pipeline.py scripts
 
@@ -34,6 +37,3 @@ jobs:
           tests/test_wechat_token.py
           tests/test_pipeline.py
           tests/test_quality_check.py
-
-      - name: Check open source snapshot
-        run: python scripts/check_open_source_snapshot.py .
