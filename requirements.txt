@@ -1,0 +1,19 @@
+# 核心
+requests>=2.31
+PyYAML>=6.0
+python-dotenv>=1.0
+Pillow>=10.0
+
+# 长图渲染（可选；仅 render 步骤需要，离线跑通可不装）
+playwright>=1.44
+
+# 测试
+pytest>=8.0
+
+# 梗图生成（可选；writer 写「梗图：喜报|文字」时用，没装则跳过）
+# 首次要拉资源：python -c "import meme_generator as m; m.resources.check_resources()"
+meme-generator>=0.2
+
+# 人物抠图（可选；下一步真日报版式要用）
+rembg[cpu]>=2.0
+opencv-python-headless>=4.10

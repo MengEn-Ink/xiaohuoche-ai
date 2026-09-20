@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# 本地质量门禁
+coverage>=7.0
+ruff>=0.6

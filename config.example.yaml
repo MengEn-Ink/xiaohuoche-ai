@@ -1,0 +1,54 @@
+# 辛庄桥小火车 AI 流水线配置（复制为 config.yaml 后修改；config.yaml 不入库）
+
+account:
+  public_name: "辛庄桥小火车"   # 公众号名 / 草稿作者
+  author: "喜子喜子"           # 草稿作者显示名
+
+# 三类栏目：对应 style/templates/ 下的分屏模板
+columns:
+  ribao:    { label: "小火车日报", title_fmt: "{md}，小火车日报。" }
+  wanbao:   { label: "小火车晚报", title_fmt: "{md}，小火车晚报" }
+  tuanjian: { label: "团建必读", title_fmt: "{md}，{name}团建必读！！" }
+  zaobao:   { label: "小火车早报", title_fmt: "{md}，小火车早报。" }
+  kuaixun:  { label: "小火车快讯", title_fmt: "{md}，小火车快讯" }
+  subao:    { label: "速报", title_fmt: "xzq今日速报（{md}）" }
+
+# 固定班底（可在稿子里覆盖）
+crew:
+  leader: "ems.王喆"
+  sweep: "莫拉"
+  meet_point: "辛庄桥"
+
+# Strava Club：在 .env 中配置 STRAVA_CLUB_URL 或 STRAVA_CLUB_ID，避免示例值覆盖环境配置
+strava:
+  club_url: ""
+  club_id: ""
+
+# 生成参数
+writer:
+  few_shot_count: 3           # 写作时检索几篇标杆样例
+  slang_required: true        # 是否强制使用骑行黑话
+  max_screens: 8              # 一篇最多分几屏
+
+# 审核 checklist（人工逐项打勾才允许进渲染）
+review_checklist:
+  - "真名/昵称已替换为当周真实队员"
+  - "功率/PR/时间数据与 Strava 一致，无编造"
+  - "被调侃队员已同意出镜"
+  - "群聊截图隐私已打码（单位/车牌/无关人员）"
+  - "粗口限于圈内口头禅，无人身攻击"
+
+# 微信接口（个人主体：只到草稿箱）
+wechat:
+  api_base: "https://api.weixin.qq.com/cgi-bin"
+  token_cache: "./data/.wechat_token.json"
+  auto_publish: false         # 个人号必须 false；企业认证号才可 true 调 freepublish
+
+# 长图版式：raw = 2024 年真日报那套（纯色底、描边大字、抠图、贴纸）；0908 = 作者复刻的卡片版
+renderer:
+  style: raw
+
+paths:
+  style_dir: "./style"
+  inbox_dir: "./data/inbox"
+  work_dir: "./data/articles"

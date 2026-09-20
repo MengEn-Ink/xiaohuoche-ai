@@ -1,0 +1,101 @@
+/* 605 真日报版式：天蓝底贯穿、无栏目标签和白卡、逐行彩色大字、人物贴纸和撕纸过渡。 */
+* { box-sizing: border-box; }
+body { margin: 0; background: #111; font-family: "PingFang SC", "Heiti SC", "Noto Sans SC", sans-serif; }
+.page { width: 1080px; margin: 0 auto; overflow: hidden; position: relative; }
+.scr { position: relative; padding: 20px 32px 18px; min-height: 0; overflow: visible; }
+.scr.has-fig { min-height: 540px; }
+.scr.over { padding: 26px 40px 30px; }
+
+/* 大字：描边 + 硬阴影，能大不小 */
+.bl { font-weight: 900; line-height: 1.1; letter-spacing: -.01em; white-space: nowrap;
+      -webkit-text-stroke: 3px #101820; paint-order: stroke fill;
+      text-shadow: 8px 8px 0 #101820; margin: 6px 0; display: inline-block; max-width: 100%; }
+.txt { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; padding: 10px 18px 16px; }
+/* 长文案一律按横向行阅读；只有不超过 10 字的短口号才允许纵向列式，避免字多时碎成窄列。 */
+.txt.copy-horizontal { writing-mode: horizontal-tb; }
+.txt.copy-vertical { min-height: 390px; max-height: 500px; flex-direction: row-reverse; justify-content: flex-start; gap: 14px; }
+.txt.copy-vertical .bl { writing-mode: vertical-rl; text-orientation: upright; white-space: nowrap; margin: 0; padding: 12px 8px; }
+.txt .bl { padding-inline: 10px; }
+.txt.has-fig-r { width: 40%; padding-right: 18px; }
+.txt.has-fig-l { width: 40%; margin-left: 60%; padding-left: 18px; }
+.txt.full-copy { width: 100%; padding-inline: 18px; }
+.tear-edge { position: absolute; left: 0; right: 0; bottom: -18px; z-index: 8; height: 38px; pointer-events: none;
+             background: #fff; clip-path: polygon(0 42%,4% 64%,9% 31%,15% 68%,21% 36%,28% 70%,35% 33%,42% 66%,49% 29%,56% 69%,63% 35%,70% 72%,77% 31%,84% 64%,91% 34%,96% 67%,100% 41%,100% 58%,96% 82%,90% 61%,83% 88%,76% 60%,69% 86%,62% 58%,55% 90%,48% 62%,41% 87%,34% 59%,27% 84%,20% 61%,13% 88%,7% 58%,0 80%); }
+
+/* 照片 / 截图 / 抠图。人物位和文字位真实分栏，不能靠层级覆盖伪造避让。 */
+.ph, .shot { position: absolute; z-index: 3; border: 6px solid #0a0a0a; box-shadow: 9px 10px 0 #0a0a0a; background: #fff; object-fit: cover; }
+.ph.r, .shot.r { right: 20px; top: 28px; width: 54%; max-height: 500px; }
+.ph.l, .shot.l { left: 20px; top: 28px; width: 54%; max-height: 500px; }
+.shot { object-fit: contain; background: #fff; }
+.ph.small { width: 31%; max-height: 320px; z-index: 4; }
+.cut { position: absolute; z-index: 4; bottom: 0; width: auto; height: auto; max-height: 98%; max-width: 58%;
+       filter: drop-shadow(0 0 8px #fff) drop-shadow(0 0 5px #fff) drop-shadow(7px 8px 0 #0a0a0a); }
+.cut.r { right: -8px; } .cut.l { left: -8px; }
+.scr.copy-wide { min-height: 0; overflow: hidden; }
+.scr.copy-wide .txt { width: 100%; padding: 4px 10px 8px; }
+.scr.copy-wide .cut.flow { position: absolute; right: 6px; bottom: 0; margin: 0; }
+.scr.copy-wide .ph.flow-extra { position: absolute; left: 32px; bottom: 18px; width: 480px; height: auto; margin: 0; object-fit: contain; }
+/* 人物屏按大图定高：素材占主视觉，文案只使用明确留出的安全栏。 */
+.scr.role-earlybird.copy-wide { height: 650px; }
+.scr.role-earlybird.copy-wide .txt { width: 56%; padding-top: 22px; }
+.scr.role-earlybird.copy-wide .txt .bl { max-width: 500px; white-space: normal !important; overflow-wrap: anywhere; }
+.scr.role-earlybird.copy-wide .cut.flow { right: 4px; width: 432px; max-width: 42%; max-height: 100%; }
+.scr.role-gossip.copy-wide { height: 650px; }
+.scr.role-gossip.copy-wide .txt { width: 100%; max-height: 180px; overflow: visible; }
+.scr.role-gossip.copy-wide .ph.flow-extra { left: 30px; bottom: 22px; width: 480px; max-height: 250px; }
+.scr.role-gossip.copy-wide .cut.flow { right: 4px; bottom: 0; width: 480px; height: 430px; max-width: 45%; max-height: none; object-fit: contain; }
+.scr.shot-stack { display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.shot.stacked { position: relative; inset: auto; display: block; width: 810px; height: auto; max-height: none; margin: 0 auto 14px; object-fit: contain; }
+
+/* 字压照片：照片铺满不裁，字块贴在上/下带子里 */
+.over-wrap { position: relative; }
+.ph.wide { position: relative; display: block; width: 100%; height: auto; max-height: none; z-index: 1; }
+.txt.over { position: absolute; left: 24px; width: 660px; z-index: 3; }
+.txt.over.top { top: 22px; }
+.txt.over.bottom { bottom: 26px; }
+.txt.over .lab { margin-bottom: 8px; }
+
+/* 纯文字屏把大字和贴纸压紧到同一视觉面，不用空背景凑高度。 */
+.scr:not(.cover):not(.has-fig):not(.over):not(.end):not(.copy-wide):not(.shot-stack) { min-height: 0; }
+.scr:not(.cover):not(.has-fig):not(.over):not(.end):not(.copy-wide) .txt { width: 100%; }
+.scr:not(.cover):not(.has-fig):not(.over):not(.end) .stk { max-width: 300px; max-height: 300px; }
+.role-preview::after { content: ""; position: absolute; right: 28px; top: 22px; bottom: 22px; width: 190px; z-index: 0;
+                       border: 6px solid #0a0a0a; background: repeating-linear-gradient(-45deg,#FFE93B 0 28px,#0a0a0a 28px 44px); }
+.role-preview.shot-stack::after { content: none; }
+.role-preview .txt { position: relative; z-index: 2; width: 76% !important; }
+
+/* 贴纸 */
+.stk { position: absolute; z-index: 5; max-width: 230px; max-height: 230px; filter: drop-shadow(6px 7px 0 rgba(10,10,10,.6)); }
+.sticker-row { position: relative; z-index: 5; display: flex; justify-content: flex-end; align-items: flex-start; gap: 20px; min-height: 0; padding: 0 28px 8px; margin-top: -18px; }
+.sticker-row .stk.flow { position: static; width: auto; max-width: 210px; max-height: 190px; }
+.scr.role-race:not(.shot-stack) { display: grid; grid-template-columns: minmax(0, 1fr) 190px; align-items: center; min-height: 0; padding: 9px 26px 6px; }
+.scr.role-race:not(.shot-stack) .txt { grid-column: 1; width: 100%; padding: 4px 8px 8px; }
+.scr.role-race:not(.shot-stack) .sticker-row { grid-column: 2; grid-row: 1; margin: 0; padding: 0; justify-content: center; }
+.scr.role-race:not(.shot-stack) .sticker-row .stk.flow { width: 150px; max-width: 150px; max-height: 145px; }
+
+/* 封面 */
+.cover { height: 460px; min-height: 460px; padding: 22px 32px 18px; overflow: visible; }
+.cover .title { font-family: "STKaiti", "KaiTi", serif; font-size: 150px; font-weight: 900; line-height: .92; color: #8CFF3F;
+                -webkit-text-stroke: 4px #101820; paint-order: stroke fill; text-shadow: 8px 8px 0 #101820;
+                letter-spacing: -.02em; transform: rotate(-1.2deg); display: inline-block; }
+.cover .date { margin-top: 4px; font-size: 72px; font-weight: 900; color: #FFE93B;
+               -webkit-text-stroke: 3px #101820; paint-order: stroke fill; text-shadow: 6px 6px 0 #101820; }
+.cover .kick { position: absolute; left: 300px; top: 170px; bottom: auto; z-index: 3; width: 750px; }
+.cover .kick .bl { font-size: 76px !important; line-height: 1.08; }
+.cover > .stk { right: 2px !important; top: 322px !important; max-width: 112px; max-height: 112px; }
+.cover-cut { position: absolute; right: 0; bottom: 0; max-height: 78%; max-width: 52%; filter: drop-shadow(8px 9px 0 rgba(10,10,10,.85)); }
+.cover-cut.wide { width: 98%; max-width: 98%; max-height: 440px; right: 1%; top: 620px; bottom: auto; filter: none; }
+.cover-wide { min-height: 1080px; }
+.cover-wide .kick { position: absolute; left: 40px; top: 350px; bottom: auto; width: 92%; margin: 0; }
+.cover-ph { position: absolute; right: 24px; bottom: 60px; width: 50%; max-height: 640px; border: 6px solid #0a0a0a; box-shadow: 9px 10px 0 #0a0a0a; object-fit: cover; }
+.cover-ph.wide { position: static; display: block; width: 94%; height: auto; max-height: none; margin: 28px 3% 0; }
+.cover-wide { min-height: 1080px; padding-bottom: 30px; }
+.cover-wide .kick { position: absolute; left: 40px; top: 350px; bottom: auto; width: 92%; margin: 0; }
+
+/* 结尾：红蓝双爱心 */
+.end { min-height: 0; height: 180px; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+.end::before, .end::after { content: none; }
+.end .txt { align-items: flex-start; position: relative; z-index: 3; width: 72%; padding: 8px 24px; }
+.end .bl { font-size: 86px !important; }
+.sig { position: absolute; right: 40px; bottom: 30px; font-size: 32px; font-weight: 900; color: #0a0a0a;
+       background: #fff; padding: 8px 18px; border: 4px solid #0a0a0a; box-shadow: 5px 5px 0 #0a0a0a; }

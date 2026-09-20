@@ -1,0 +1,27 @@
+:root{--sky:#00a8ff;--coral:#ff2b00;--lemon:#fff200;--lime:#39ff14;--ink:#050505;--paper:#f8f1df}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ink)}
+body{width:1080px;max-width:100%;margin:0 auto;background:var(--ink);color:var(--ink);font-family:"ZCOOL KuaiLe","Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;overflow-x:hidden}
+#article-content{width:1080px;max-width:100%;margin:0 auto;background:var(--ink)}
+.masthead{position:relative;min-height:520px;padding:52px 54px 36px;background:var(--sky);border-bottom:14px solid var(--ink);overflow:hidden}
+.masthead::before{content:"XZQ WEEKLY RIDE";position:absolute;left:-20px;bottom:-28px;color:rgba(0,0,0,.14);font-size:118px;font-weight:1000;white-space:nowrap;letter-spacing:-4px;transform:rotate(-3deg)}
+.kicker{display:inline-block;background:var(--lemon);border:7px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:10px 22px;font:900 34px/1 sans-serif;letter-spacing:4px}
+h1{position:relative;max-width:930px;margin-top:34px;color:#fff;font-size:92px;line-height:1.02;font-weight:1000;letter-spacing:-3px;-webkit-text-stroke:5px var(--ink);text-shadow:10px 10px 0 var(--coral);word-break:keep-all}
+.issue{position:absolute;right:48px;top:46px;background:var(--coral);color:#fff;border:7px solid var(--ink);box-shadow:9px 9px 0 var(--ink);padding:12px 20px;font:1000 40px/1 sans-serif;transform:rotate(3deg)}
+.screen{position:relative;margin:0;padding:42px 52px 46px;background:var(--panel);border-bottom:14px solid var(--ink);min-height:260px;overflow:hidden;scroll-margin-top:80px}
+.role-cover,.role-review{--panel:var(--sky);--accent:var(--lemon)}.role-feeling,.role-shirt{--panel:var(--lemon);--accent:var(--coral)}.role-gossip{--panel:var(--coral);--accent:var(--lemon)}.role-race,.role-preview,.role-checklist{--panel:var(--lime);--accent:var(--coral)}.role-end{--panel:var(--ink);--accent:var(--lemon)}
+.screen:nth-of-type(even)::after{content:"XZQ";position:absolute;right:-20px;bottom:-45px;color:rgba(0,0,0,.11);font:1000 160px/1 sans-serif;transform:rotate(-8deg)}
+.badge{position:relative;z-index:2;display:inline-block;background:var(--accent);color:var(--ink);border:6px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:9px 18px;font:1000 31px/1 sans-serif;letter-spacing:2px;transform:rotate(-1deg)}
+.copy{position:relative;z-index:2;margin-top:28px;max-width:940px}
+.copy p{font-size:54px;line-height:1.16;font-weight:1000;letter-spacing:-1px;margin:0 0 14px;word-break:normal;overflow-wrap:anywhere}
+.copy p:last-child{margin-bottom:0}.placeholder{color:rgba(0,0,0,.52)}
+.stamp{display:inline-block;background:var(--lemon);border:5px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:1px 10px;transform:rotate(-3deg)}
+.material-note{position:relative;z-index:2;margin-top:24px;border:5px dashed var(--ink);padding:15px 18px;font:900 30px/1.25 sans-serif}
+.material-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:28px;background:var(--paper);border-bottom:14px solid var(--ink)}.material-image{overflow:hidden;border:7px solid var(--ink);background:#fff}.material-image img{display:block;width:100%;height:430px;object-fit:cover}.material-image figcaption{padding:12px 16px;font:900 25px/1.2 sans-serif}
+.role-gossip,.role-end{color:#fff}.role-gossip .badge,.role-end .badge{color:var(--ink)}
+.role-gossip .placeholder,.role-end .placeholder{color:rgba(255,255,255,.72)}
+.footer{position:relative;min-height:230px;padding:54px 52px 92px;background:var(--ink);color:#fff;font:1000 45px/1.15 sans-serif;letter-spacing:2px}
+.footer strong{color:var(--lemon);font-size:66px}.wechat-safe{position:absolute;right:0;bottom:0;width:270px;height:100px}
+.draft-banner{position:fixed;z-index:99;right:-82px;top:54px;width:390px;padding:15px 0;background:#fff;color:#d40000;border:7px solid #d40000;text-align:center;font:1000 30px/1 sans-serif;transform:rotate(35deg)}
+@media(max-width:700px){.masthead{min-height:360px;padding:86px 22px 30px}.masthead::before{font-size:64px}.kicker{font-size:18px;border-width:4px}.issue{top:18px;right:18px;font-size:22px;border-width:4px}h1{font-size:54px;-webkit-text-stroke:3px}.screen{padding:32px 20px}.badge{font-size:20px;border-width:4px}.copy p{font-size:32px}.footer{font-size:28px;padding-left:22px}.footer strong{font-size:44px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

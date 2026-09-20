@@ -1,0 +1,26 @@
+# 密钥与环境
+.env
+config.yaml
+
+# 数据与产物
+data/
+/build/
+/open-source-snapshot/
+*.png
+*.jpg
+*.jpeg
+!style/**/*.png
+
+# AIME App 开发数据与安装包
+/aime-app/xiaohuoche-ribao/.dev-data/
+/aime-app/xiaohuoche-ribao/.runtime/
+/aime-app/xiaohuoche-ribao/dist/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.DS_Store
+style/stickers/generated/
